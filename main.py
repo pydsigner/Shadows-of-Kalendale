@@ -59,6 +59,7 @@ HeroPoison = 0
 
 AltCmd = {"north":"n", "south":"s", "east":"e", "west":"w", "up":"u", "down":"d",
           "inventory":"i", "inv":"i",
+          'l': 'look',
           "look weapon prices":"weapon prices", "look armor prices":"armor prices", "look shield prices":"shield prices", "look training prices":"training prices",
           "quit":"q","suicide":"q","die":"q","exit":"q","save":"savegame"}
 
@@ -114,7 +115,7 @@ IntroText = ["Ever since you can remember, tales of fame and wealth have littere
 
 # Dictionary for room descriptions
 RoomDescription = {1:"Here appears to be the castle's armory. The royal guard, as well as the city militia, spend most of their time here practicing combat under careful watch of their trainers. You see a sign that says 'TRAINING PRICES'. The royal courtyard lies to the east.",
-                   2:"You are in the royal courtyard. The main entrance to the keep lies to the north. A massive wooden door lined with large iron bars has it sealed tight. To the south, an open portculis gives access to the city. To the west you hear the sound of weapons clashing. To the east flows the sound of hooves on coblestone.",
+                   2:"You are in the royal courtyard. The main entrance to the keep lies to the north. A massive wooden door lined with large iron bars has it sealed tight. To the south, an open portculis gives access to the city. To the west you hear the sound of weapons clashing. To the east flows the sound of hooves on cobblestone.",
                    3:"The scent of manure and fresh hay fills your nostrils. Some of the greatest steeds in all the land of Kalendale are bred in these stables. To the west lies the royal courtyard.",
                    4:"The entrance to the crypt gives off a very different feeling, over the peace of the chapel to the south. A cold air rises from the steps leading down. Something dark... and foul... lies beneath.",
                    5:"The sound of a hammer on metal, along with the wind of the bellows fill your ears as you enter. The heat of the forge here, threatens to melt your skin. A blacksmith looks at you, nods to 3 signs on the wall and goes back to his work. The signs are titled: 'WEAPON PRICES', 'ARMOR PRICES', and 'SHIELD PRICES'. You see doors to the street at both the east and the south.",
@@ -1676,7 +1677,7 @@ def EquipItem(HeroSTRBonus,HeroClass,HeroMinDmg,HeroMaxDmg,HeroArmor,WeaponSlot,
             HeroMinDmg -= 1
             HeroMaxDmg -= 3
             ItemEquipped(HeroCmd)
-                                                                                                     
+    
     elif HeroCmd[6:] in Inventory and HeroCmd[6:] in ArmorStats and ArmorSlot == 0:
         if HeroClass == "Sorcerer" and ArmorStats[HeroCmd[6:]][5] > 1:
             print "As a sorcerer, you cannot wear:", HeroCmd[6:]
@@ -2337,11 +2338,12 @@ def SpawnCombat(CurrentWeather,WeatherTimer,TimeOfDayTimer,TimeOfDay,HeroBuff,He
         elif TrapType == 1:
             HeroHealth -= (3 * HeroLevel)
             print "\n You have triggered an explosive trap! You have been hit for", (3 * HeroLevel), "damage!"
-            if HeroHealth < 1:
-                MonsterSpawnChance = 0
+            
 
-    # generate a 1 in 20 chance of generating a monster
+    # generate a 4 in 20 chance of generating a monster
     MonsterSpawnChance = random.randint(0,19)
+    if HeroHealth < 1:
+        MonsterSpawnChance = 0
 
     # make a temp dictionary for monster of the current room level
     CurrentMonsterLevel = {}
@@ -2546,14 +2548,13 @@ def MainProgram(RoomNumberStart,HeroBuff,HeroPoison,HeroBuffTimer,HeroPoisonTime
             RoomNumber = ResurrectionRooms[0]
             HeroHealth = HeroMaxHealth
             HeroMagic = HeroMaxMagic
-            if HeroGold > 20:
-                HeroGold -= (20 * HeroLevel)
-            elif HeroGold <= 20:
+            HeroPoisonTimer = 0
+            
+            HeroGold -= (20 * HeroLevel)
+            if HeroGold < 0:
                 HeroGold = 0
-            if HeroPoisonTimer > 0:
-                HeroPoisonTimer = 0
-
-# This is the main string input for commands from the hero
+        
+        # This is the main string input for commands from the hero
         print
         RepeatCmd = HeroCmd
         HeroCmd = raw_input ("HP:" + str(HeroHealth) + "/" + str(HeroMaxHealth) + " MP:" + str(HeroMagic) + "/" + str(HeroMaxMagic) + " > ").lower()
@@ -2561,11 +2562,13 @@ def MainProgram(RoomNumberStart,HeroBuff,HeroPoison,HeroBuffTimer,HeroPoisonTime
             print "Repeating Last Command: '" + RepeatCmd + "'"
             HeroCmd = RepeatCmd
         
-# Convert inputs to common commands
+        # Convert inputs to common commands
         if HeroCmd in AltCmd:
             HeroCmd = AltCmd[HeroCmd]
-
-# Route inputs to proper functions
+           
+        #command, args = HeroCmd.split(maxsplit = 1)
+        
+        # Route inputs to proper functions
         if HeroCmd == "n":
             HeroHealth,HeroBuff,HeroPoison,HeroBuffTimer,HeroPoisonTimer,CurrentWeather,RoomNumber,GameTurns,WeatherTimer,TimeOfDayTimer,TimeOfDay = RoomMove(Inventory,HeroHealth,HeroBuff,HeroPoison,HeroBuffTimer,HeroPoisonTimer,CurrentWeather,RoomNumber,HeroCmd,GameTurns,WeatherTimer,TimeOfDayTimer,TimeOfDay)
             RoomItems(RoomInv, RoomNumber)
@@ -2660,14 +2663,12 @@ def MainProgram(RoomNumberStart,HeroBuff,HeroPoison,HeroBuffTimer,HeroPoisonTime
             QuitConfirm = raw_input ("\nAre you sure you wish to quit the program? (Y/N) ").lower()
             if QuitConfirm == "y":
                 print "\nThanks for playing!\n"
-                time.sleep(3)
-                break
+                return
             else:
                 print "\nI knew you would rather stay..."
                 HeroCmd = ""
 ###        elif HeroCmd == "savecamp":
 ###            import pickle
-
 ###             SaveInfo = (RoomNumberStart,Inventory,HeroSpells,ItemsWorn,BlacksmithRooms,PawnshopRooms,ApothecaryRooms,ArcaneSpellshopRooms,DivineSpellshopRooms,FighterTrainerRooms,RogueTrainerRooms,SorcererTrainerRooms,ClericTrainerRooms,ResurrectionRooms,IntroText,RoomDescription,RoomIndex,RoomInv,MonsterIndex,SolidItem,SolidItem2,LootItems,WeaponStats,ArmorStats,ShieldStats,UseableItems,ArcaneBattleSpells,DivineBattleSpells,ArcaneHealingSpells,DivineHealingSpells,ArcaneBuffSpells,DivineBuffSpells,SpecialArcane,SpecialDivine)
 ###             with open('Custom1.cmp', 'wb') as output:
 ###                 pickle.dump(SaveInfo, output)
@@ -2718,7 +2719,7 @@ def MainProgram(RoomNumberStart,HeroBuff,HeroPoison,HeroBuffTimer,HeroPoisonTime
 # Function to create new game
 def NewGame(RoomNumberStart,HeroName,IntroText):
     while HeroName == False:
-        HeroName = raw_input("\n What is your name, hero? ")
+        HeroName = raw_input("\n What is your name, hero? ").title()
         print "\n From henceforth your name shall be known as: "+ HeroName
         HeroNameTrue = raw_input ("\n Is this correct? (Y/N)").lower()
         if HeroNameTrue == "y":
@@ -2804,5 +2805,5 @@ while GameChoice != "q":
         print "\n You can access the list of commands in-game by typing 'help'\n"
     elif GameChoice == "q":
         print "\n Sorry to see you go so soon...\n"
-        time.sleep(3)
-        break
+
+raw_input()
