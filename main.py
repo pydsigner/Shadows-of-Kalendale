@@ -7,13 +7,13 @@ import textwrap
 try:
     import readline
 except ImportError:
-    # Sorry, Windows users!
+    # Sorry, Windoze users!
     pass
     
 # Since we have so many checks for this, we make a convenience variable
 OP4 = list('1234')
 
-HeroCmd = False
+HeroCmd = ''
 GameChoice = False
 GameTurns = 0
 AttackCmd = ""
@@ -721,7 +721,8 @@ LootItems = {"pretty rock":[1,1,1,"It's a pretty rock. Looks like it could be of
              "diamond":[1,100,10,"The jewel of all jewels. It's sparkle promises great wealth."]}
 
 # for reasons unknown, rare loot items must be listed by level in decending order if there are duplicates (something to do with the search function)
-RareLootItems = {"bone armor":[800,130,4,""],
+RareLootItems = {'fell sword': [1000, 250, 5, ''],
+                 "bone armor":[800,130,4,""],
                  "crystal longsword":[500,90,3,""],
                  "fine robe":[300,40,2,""],
                  "fine shortsword":[150,30,1,""],
@@ -736,14 +737,15 @@ WeaponStats = {"branch":[0,0,1,3,0,0,0,1,1,"You believe this will do no more dam
                "spiked club":[10,1,2,4,0,1,2,0,1,"An improvement over the standard club design. This will ensure that blood is drawn upon impact."],
                "axe":[20,2,1,5,0,1,2,0,1,"Favored by the dwarves. The hard wooden handly is fitted well in to the metal wedge. Simple, yet deadly."],
                "heavy flail":[30,3,1,8,0,1,2,1,2,"A weighted ball attached by chain to a long sturdy handle.\nBuilt for two hands, this weapon strikes fear in to its opponents."],
-               "mace":[35,4,1,5,0,1,2,1,1,"Favored by holy warriors. The weight will crush an opponents skull, and the bones of the undead."],
-               "shortsword":[60,6,1,6,0,0,1,0,0,"It's a shortsword"],
-               "fine shortsword":[150,15,1,7,0,1,1,0,0,"It's a well crafted shortsword"],
-               "longsword":[80,8,1,8,0,1,2,0,1,"It's a longsword"],
-               "battle axe":[100,10,1,8,0,1,2,0,1,"It's a battle axe"],
+               "mace":[35,4,1,5,0,1,2,1,1,"Favored by holy warriors. The weight will crush an opponents skull easily."],
+               "shortsword":[60,6,1,6,0,0,1,0,0,"It's a shortsword. Simple, small, and utilitarian."],
+               "fine shortsword":[150,15,1,7,0,1,1,0,0,"It's a well crafted shortsword, made by someone with some skill."],
+               "longsword":[80,8,1,8,0,1,2,0,1,"It's a longsword A touch of silver on the hilt is all that its maker splurged upon it."],
+               "battle axe":[95,10,1,9,0,1,2,0,1,"It's a battle axe, a fearsome and deadly weapon."],
                "bastard sword":[120,12,1,10,0,1,2,0,1,"Larger than a longsword, but still made for one hand.\n It is not built for the weak."],
-               "greatsword":[140,14,2,12,0,1,2,0,2,"A large, two-handed sword."],
-               "crystal longsword":[500,90,2,12,0,0,2,0,1,"The size of a standard longsword, but it appears to be almost made of glass."]}
+               "greatsword":[140,14,2,12,0,1,2,0,2,"A large, two-handed sword. The classic weapon of heroes. "],
+               "crystal longsword":[500,90,2,12,0,0,2,0,1,"The size of a standard longsword, but it appears to be almost made of glass."],
+               'fell sword':[1000,250,10,28,0,0,2,0,1,'Forged by some long-forgotten Dwarf, this renowned yet mysterious sword can slice through wood with ease. The blue steel of the blade seems almost to glow, and the hilt is artistically but practically embossed with gold, giving a superior grip.']}
 
 # Declare armor and shields with stats-  "item name":[buy price, sell price, armor value, health bonus, if item can be bought (0 = no, 1 = yes),type (0 = universal, 1 = cloth, 2 = light, 3 = medium, 4 = heavy)] 
 ArmorStats = {"cloth vestments":[1,1,0,0,0,0,"These clothes look like they won't do much except preserve modesty."],
@@ -756,7 +758,7 @@ ArmorStats = {"cloth vestments":[1,1,0,0,0,0,"These clothes look like they won't
               "fullplate":[1500,150,10,0,1,4,"Lightweight forged steel covers all areas of the body offering maximum protection."],
               "bone armor":[800,130,9,0,0,2,"Made of pure bone, this armor appears to as strong as platemail, but feels lighter than leather."]}
 
-ShieldStats = {"buckler":[20,2,1,0,1,2,"A small wooden shield with a metal handle."],
+ShieldStats = {"buckler":[10,1,1,0,1,2,"A small wooden shield with a metal handle."],
                "wooden shield":[20,2,2,0,1,2,"Larger than a buckler, and offering slightly more protection."],
                "round shield":[35,4,3,0,1,3,"A mid sized round shield made of wood and covered in thin steel."],
                "heater shield":[60,6,4,0,1,3,"A mid sized shield made of forged steel."],
@@ -1828,21 +1830,21 @@ def BuyItems(HeroCmd,RoomNumber,HeroGold):
             if HeroCmd[4:] in WeaponStats:
                 if WeaponStats[HeroCmd[4:]][0] <= HeroGold:
                     Inventory.append(HeroCmd[4:])
-                    HeroGold = HeroGold - WeaponStats[HeroCmd[4:]][0]
+                    HeroGold -= WeaponStats[HeroCmd[4:]][0]
                     print "\n'Aha! " + HeroCmd[4:] + "! Good choice. I'll take your", WeaponStats[HeroCmd[4:]][0],"gold for that...'"
                 elif WeaponStats[HeroCmd[4:]][0] > HeroGold:
                     print "\n'I'm sorry, it looks like you don't have enough gold...'"       
             elif HeroCmd[4:] in ArmorStats:
                 if ArmorStats[HeroCmd[4:]][0] <= HeroGold:
                     Inventory.append(HeroCmd[4:])
-                    HeroGold = HeroGold - ArmorStats[HeroCmd[4:]][0]
+                    HeroGold -= ArmorStats[HeroCmd[4:]][0]
                     print "\n'Aha! " + HeroCmd[4:] + "! Good choice. I'll take your", ArmorStats[HeroCmd[4:]][0],"gold for that...'"
                 elif ArmorStats[HeroCmd[4:]][0] > HeroGold:
                     print "\n'I'm sorry, it looks like you don't have enough gold...'"     
             elif HeroCmd[4:] in ShieldStats:
                 if ShieldStats[HeroCmd[4:]][0] <= HeroGold:
                     Inventory.append(HeroCmd[4:])
-                    HeroGold = HeroGold - ShieldStats[HeroCmd[4:]][0]
+                    HeroGold -= ShieldStats[HeroCmd[4:]][0]
                     print "\n'Aha! " + HeroCmd[4:] + "! Good choice. I'll take your", ShieldStats[HeroCmd[4:]][0],"gold for that...'"
                 elif ShieldStats[HeroCmd[4:]][0] > HeroGold:
                     print "\n'I'm sorry, it looks like you don't have enough gold...'"
@@ -1852,7 +1854,7 @@ def BuyItems(HeroCmd,RoomNumber,HeroGold):
             if HeroCmd[4:] in UseableItems:
                 if UseableItems[HeroCmd[4:]][0] <= HeroGold:
                     Inventory.append(HeroCmd[4:])
-                    HeroGold = HeroGold - UseableItems[HeroCmd[4:]][0]
+                    HeroGold -= UseableItems[HeroCmd[4:]][0]
                     print "\n'Aha! " + HeroCmd[4:] + "! Good choice. I'll take your", UseableItems[HeroCmd[4:]][0],"gold for that...'"
                 elif UseableItems[HeroCmd[4:]][0] > HeroGold:
                     print "\n'I'm sorry, it looks like you don't have enough gold...'"
@@ -1865,7 +1867,7 @@ def SellItems(HeroCmd,RoomNumber,HeroGold):
     if RoomNumber in PawnshopRooms:
         if HeroCmd[5:] in Inventory and HeroCmd[5:] in WeaponStats:
             Inventory.remove(HeroCmd[5:])
-            HeroGold = HeroGold + WeaponStats[HeroCmd[5:]][1]
+            HeroGold += WeaponStats[HeroCmd[5:]][1]
             print "\n'A " + HeroCmd[5:] + "? Here is", WeaponStats[HeroCmd[5:]][1], "gold for that...'"    
         elif HeroCmd[5:] in Inventory and HeroCmd[5:] in ArmorStats:
             Inventory.remove(HeroCmd[5:])
@@ -2537,7 +2539,9 @@ def RoomEvent(RoomNumber,Inventory):
 
 # Main Program Loop
 def MainProgram(RoomNumberStart,HeroBuff,HeroPoison,HeroBuffTimer,HeroPoisonTimer,CurrentWeather,WeatherTimer,TimeOfDayTimer,TimeOfDay,HeroMagicAttack,HeroSpells,SpellChanted,HeroSTRBonus,HeroDEXBonus,HeroINTBonus,HeroRace,HeroClass,HeroSTR,HeroSTA,HeroDEX,HeroINT,HeroAttack,RoomInv,HeroLevel,HeroBaseMinDmg,HeroBaseMaxDmg,HeroBaseArmor,HeroMaxMagic,HeroBaseSpell,HeroExperience,HeroMaxHealth,HeroHealth,HeroMinDmg,HeroMaxDmg,HeroArmor,HeroMagic,HeroSpell,HeroGold,HeroCmd,HeroName,RoomNumber,WeaponSlot,ArmorSlot,ShieldSlot,GameTurns):
-    while HeroCmd != "quit":
+    cmd_repeats = 0
+    RepeatCmd = ''
+    while 1:
 
 # Check if the player is dead
         if HeroHealth < 1:
@@ -2556,9 +2560,28 @@ def MainProgram(RoomNumberStart,HeroBuff,HeroPoison,HeroBuffTimer,HeroPoisonTime
         
         # This is the main string input for commands from the hero
         print
-        RepeatCmd = HeroCmd
-        HeroCmd = raw_input ("HP:" + str(HeroHealth) + "/" + str(HeroMaxHealth) + " MP:" + str(HeroMagic) + "/" + str(HeroMaxMagic) + " > ").lower()
-        if HeroCmd == "r":
+        oldrepeatcmd = RepeatCmd
+        
+        if HeroCmd == 'r' or HeroCmd.startswith('r '):
+            RepeatCmd = oldrepeatcmd
+        else:
+            RepeatCmd = HeroCmd
+        
+        #print oldrepeatcmd, RepeatCmd, HeroCmd
+        
+        if cmd_repeats:
+            cmd_repeats -= 1
+            print "Repeating Last Command: '" + RepeatCmd + "'"
+        else:
+            HeroCmd = raw_input ("HP:" + str(HeroHealth) + "/" + str(HeroMaxHealth) + " MP:" + str(HeroMagic) + "/" + str(HeroMaxMagic) + " > ").lower()
+        
+        if HeroCmd == 'r' or HeroCmd.startswith('r '):
+            print HeroCmd
+            if not RepeatCmd:   # make sure there *is* a command to repeat
+                print 'No command to repeat.'
+                continue        # go on with the next loop
+            if HeroCmd[1:]:
+                cmd_repeats = int(HeroCmd[2:].strip()) - 1
             print "Repeating Last Command: '" + RepeatCmd + "'"
             HeroCmd = RepeatCmd
         
@@ -2713,6 +2736,8 @@ def MainProgram(RoomNumberStart,HeroBuff,HeroPoison,HeroBuffTimer,HeroPoisonTime
    
         else:
             print "\nThat is not a recognized command..."
+            # Reload old repeated command
+            HeroCmd = oldrepeatcmd
 
     return (HeroBuff,HeroPoison,HeroBuffTimer,HeroPoisonTimer,CurrentWeather,WeatherTimer,TimeOfDayTimer,TimeOfDay,HeroMagicAttack,HeroSpells,SpellChanted,HeroSTRBonus,HeroDEXBonus,HeroINTBonus,HeroRace,HeroClass,HeroSTR,HeroSTA,HeroDEX,HeroINT,HeroAttack,HeroGold,HeroCmd,HeroName,RoomNumber,WeaponSlot,ArmorSlot,ShieldSlot)
 
@@ -2776,7 +2801,7 @@ while GameChoice != "q":
     print "__)| |(_|(_|(_)\^/_>    (_) |    |\ (_| | (/_| |(_|(_| | (/_"
     print
     print " A text-based RPG"
-    print " Revision 00000.87"
+    print " Revision 00000.88"
     print
     print " Programming by:"
     print "   Michael Kadlec"
